@@ -1,0 +1,135 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mtatrace;
+
+import com.viettel.common.bean.AuditLog;
+import com.viettel.common.bean.MsgMail;
+import com.viettel.common.db.QueryUtils;
+import com.viettel.common.util.ActionThread;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.LinkedBlockingQueue;
+import org.apache.log4j.helpers.DateTimeDateFormat;
+
+/**
+ *
+ * @author thanhbv4
+ */
+public class LogAuditProcess extends ActionThread {
+
+    public LogAuditProcess(String name, LinkedBlockingQueue<AuditLog> queueAudit) {
+        this.setName(name);
+        this.queueAudit = queueAudit;
+    }
+    private LinkedBlockingQueue<AuditLog> queueAudit;
+//    private String logFile = "D:\\sourcecode\\MtaTrace\\audit.log";
+    private String logFile = "F:\\SOURCE CODE\\khoand\\CODE\\LogEmail\\SAVE DB\\log\\audit.log";
+
+    private void getConfig() {
+        Properties properties = new Properties();
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream("../etc/config.properties");
+            properties.load(fileInputStream);
+            this.logFile = properties.getProperty("Log_file");
+        } catch (IOException ex) {
+
+        } finally {
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException ex) {
+
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onExecuting() throws Exception {
+
+    }
+
+    @Override
+    protected void onKilling() {
+
+    }
+
+    @Override
+    protected void onException(Exception e) {
+
+    }
+
+    @Override
+    protected long sleeptime() throws Exception {
+        return 10 * 60 * 1000;
+    }
+
+    @Override
+    protected void action() throws Exception {
+        getConfig();
+        OnProcess(new File(logFile));
+    }
+
+    public void OnProcess(File logFile) throws FileNotFoundException, IOException, Exception {
+        
+
+        BufferedReader reader = new BufferedReader(new FileReader(logFile));
+
+        String line = "";
+        String key = "oip";
+        String timeAuth;
+        String userName;
+        String oip;
+        String protocol;
+        int count = 0;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+
+        while ((line = reader.readLine()) != null) {
+            
+            if (line.contains(key)) {
+                AuditLog audit = new AuditLog();
+                System.out.println("line: " + line);
+                timeAuth = line.substring(0, line.indexOf(","));
+                System.out.println("time Auth: " + timeAuth);     
+                audit.setDateAudit(formatter.parse(timeAuth));
+                userName = line.substring(line.indexOf("account=") + 8, line.indexOf("; protocol"));
+                System.out.println("User Name: " + userName);
+                audit.setEmail(userName);
+                oip = line.substring(line.indexOf(";oip=") + 5, line.indexOf(";]"));
+                System.out.println("IP original: " + oip);
+                audit.setOip(oip);
+                protocol = line.substring(line.indexOf("protocol=") + 9, line.length() - 1);
+                System.out.println("protocol: " + protocol);
+                audit.setProtocol(protocol);
+                queueAudit.add(audit);
+            }
+            count++;
+        }
+        reader.close();
+//        logFile.delete();
+        if (logFile.delete()) {
+                        System.out.println(logFile.getName() + " is deleted!");
+                    } else {
+                        System.out.println("Delete operation is failed.");
+                    }
+    }
+
+    /**
+     * @return the queueAudit
+     */
+    public LinkedBlockingQueue<AuditLog> getQueueAudit() {
+        return queueAudit;
+    }
+}

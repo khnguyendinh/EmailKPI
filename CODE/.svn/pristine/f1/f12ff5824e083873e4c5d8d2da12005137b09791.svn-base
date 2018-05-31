@@ -1,0 +1,42 @@
+#=================================================
+# Log4j configuration - Message module
+# Viettel Payment Gateway
+#=================================================
+
+#===================================================================
+#REAL
+
+#declare two logger
+#log4j.logger.postbill=debug,logcommon
+log4j.logger.postbill=debug
+#log4j.rootLogger=info,MM_SOCK
+log4j.category.mtalog=DEBUG, mtalog
+log4j.category.maillog=DEBUG, maillog
+log4j.category.DBProcess=DEBUG, DBProcess
+log4j.additivity.mtalog=false
+log4j.additivity.maillog=false
+log4j.additivity.DBProcess=false
+
+#mta appender
+log4j.appender.mtalog=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.mtalog.File=log/kpiMta.log
+log4j.appender.mtalog.DatePattern='.'yyyy-MM-dd
+log4j.appender.mtalog.layout=org.apache.log4j.PatternLayout
+log4j.appender.mtalog.layout.ConversionPattern=%d{dd/MM/yyyy HH:mm:ss} %5p [%t] %c{1}: %m%n
+Log4j.appender.mtalog.layout.ConversionPattern=%d{ISO8601} %-5p %c{2} (%F:%M(%L)) - %m%n
+#KPI MAIL LOG
+log4j.appender.maillog=org.apache.log4j.DailyRollingFileAppender
+#log4j.appender.maillog.File=log/kpiMailbox.log
+log4j.appender.maillog.File=F:\\SOURCE CODE\\khoand\\CODE\\LogEmail\\log4J\\kpiMailbox.log
+log4j.appender.maillog.DatePattern='.'yyyy-MM-dd
+log4j.appender.maillog.layout=org.apache.log4j.PatternLayout
+log4j.appender.maillog.layout.ConversionPattern=%d{dd/MM/yyyy HH:mm:ss} %5p [%t] %c{1}: %m%n
+Log4j.appender.maillog.layout.ConversionPattern=%d{ISO8601} %-5p %c{2} (%F:%M(%L)) - %m%n
+#DB LOG
+log4j.appender.DBProcess=org.apache.log4j.DailyRollingFileAppender
+#log4j.appender.DBProcess.File=log/kpiDBProcess.log
+log4j.appender.DBProcess.File=F:\\SOURCE CODE\\khoand\\CODE\\LogEmail\\log4J\\kpiDBProcess.log
+log4j.appender.DBProcess.DatePattern='.'yyyy-MM-dd
+log4j.appender.DBProcess.layout=org.apache.log4j.PatternLayout
+log4j.appender.DBProcess.layout.ConversionPattern=%d{dd/MM/yyyy HH:mm:ss} %5p [%t] %c{1}: %m%n
+Log4j.appender.DBProcess.layout.ConversionPattern=%d{ISO8601} %-5p %c{2} (%F:%M(%L)) - %m%n

@@ -1,0 +1,34 @@
+################ LOCAL   ##########
+folderDirectory_MTA=F:\\SOURCE CODE\\khoand\\CODE\\LogEmail\\CODE\\log\\zimbra.log
+folderDirectory_MailLog=F:\\SOURCE CODE\\khoand\\DOCUMENT\\ReadLog\\mail 1\\mail_box_7\\mailbox.log
+errorDirectory=/home/app/MtaTrace/error/
+percentLogRead_MTA=100
+percentLogRead_MailLog=100
+Size=2
+#So dong Read 1 lan :dong
+NUMBER_LINE_READ_ONE_TIME_MAIL=1000
+NUMBER_LINE_READ_ONE_TIME_MTA=10000
+#Thoi gian sleep  1 lan :phut
+SleepTime_Mail=0
+SleepTime_MTA=1
+#Run Mail Log 1 :run 0 : khong run
+isRunMailLog =0
+#Run MTA log 1 :run 0 : khong run 
+isRunMTALog =1
+################ REAL ################
+#folderDirectory_MTA=zimbra.log
+#folderDirectory_MailLog=mailbox.log
+#errorDirectory=/home/app/MtaTrace/error/
+#percentLogRead_MTA=100
+#percentLogRead_MailLog=100
+#Size=1
+##So dong Read 1 lan :dong
+#NUMBER_LINE_READ_ONE_TIME_MAIL=10000
+#NUMBER_LINE_READ_ONE_TIME_MTA=1000
+##Thoi gian sleep  1 lan :phut
+#SleepTime_Mail=1
+#SleepTime_MTA=1
+#Run Mail Log 1 :run 0 : khong run
+#isRunMailLog =0
+#Run MTA log 1 :run 0 : khong run 
+#isRunMTALog =1

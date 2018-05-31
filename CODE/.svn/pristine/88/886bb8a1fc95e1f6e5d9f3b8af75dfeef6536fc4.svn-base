@@ -1,0 +1,151 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mtatrace;
+
+import com.viettel.mmserver.base.ProcessThreadMX;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.concurrent.LinkedBlockingQueue;
+import org.apache.log4j.Logger;
+
+/**
+ *
+ * @author huytq20
+ */
+public class SystemManager extends ProcessThreadMX {
+
+    private Logger logger = Logger.getLogger(SystemManager.class.getName());
+    private long poll_time;
+    private LogEmailProcess logEmailProcess;
+    private LogMTAProcess logMTAProcess;
+    private DBProcess pDB;
+    private static SystemManager instance;
+    private boolean mBeanIsStarted;
+    LinkedBlockingQueue queueEmail = new LinkedBlockingQueue(50000);
+    LinkedBlockingQueue queueMTA = new LinkedBlockingQueue(50000);
+    private boolean isRunMailLog = false;
+    private boolean isRunMTALog = false;
+    private String config = "../etc/config.properties";
+//    private String config = "F:\\SOURCE CODE\\khoand\\DOCUMENT\\ReadLog\\config.properties";
+//    private String config = "F:\\SOURCE CODE\\khoand\\DOCUMENT\\ReadLog\\config2.properties";
+    public static SystemManager getInstance() {
+        if (instance == null) {
+            instance = new SystemManager("VMAIL", "Gent Thumb Checker", "Vmail:name=VMAIL");
+        }
+        return instance;
+    }
+
+    public SystemManager(String threadName, String description, String MBeanName) {
+        super(threadName, description);
+
+        mBeanIsStarted = false;
+//          registerAgent(MBeanName);
+
+    }
+
+    public void start() {
+        getConfig();
+        if (!mBeanIsStarted) {
+            logger.info("Start to check offline encoder system manager ");
+            mBeanIsStarted = true;
+            super.start();
+        }
+
+        logger.info("Start to check offline encoder system manager ");
+        if(isRunMailLog){
+            logEmailProcess = new LogEmailProcess("Email_Log_Process", queueEmail);
+            logEmailProcess.execute();
+        }
+        if(isRunMTALog){
+            //log MTA
+            logMTAProcess = new LogMTAProcess("MTA_Log_Process", queueMTA);
+            logMTAProcess.execute();
+        }
+        pDB = new DBProcess("DBProcess", queueEmail,queueMTA);
+        pDB.execute();
+        
+        
+//        TestProccess testProccess = new TestProccess("Email_Log_Process", queue);
+//        testProccess.execute();
+    }
+
+    public void stop() {
+        if (!isRunMailLog) {
+            this.logEmailProcess.kill();
+        }
+        if (!isRunMTALog) {
+            this.logMTAProcess.kill();
+        }
+    }
+
+    @Override
+    public void restart() {
+        if (!isRunMailLog) {
+            this.logEmailProcess.kill();
+        }
+        if (!isRunMTALog) {
+            this.logMTAProcess.kill();
+
+        }
+        this.pDB.kill();
+        try {
+            if (!isRunMailLog) {
+                logEmailProcess = new LogEmailProcess("Email_Log_Process", queueEmail);
+                logEmailProcess.execute();
+            }
+            if (!isRunMTALog) {
+                //log MTA
+                logMTAProcess = new LogMTAProcess("MTA_Log_Process", queueMTA);
+                logMTAProcess.execute();
+            }
+            pDB = new DBProcess("DBProcess", queueEmail,queueMTA);
+            pDB.execute();
+        } catch (Exception var1_2) {
+            this.logger.error((Object) ("Error : " + var1_2.getMessage()));
+        }
+    }
+
+    @Override
+    protected void process() {
+        poll_time = 1000;
+
+        try {
+            Thread.currentThread().sleep(poll_time);
+        } catch (InterruptedException ex) {
+            java.util.logging.Logger.getLogger(SystemManager.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        logger.info("Periodically check LogReader system manager ................");
+
+    }
+
+    private void getConfig() {
+        Properties properties = new Properties();
+        FileInputStream fileInputStream = null;
+        logger.info("LogEmailProcess get Config");
+        System.out.println("get config EMAIL");
+        try {
+            fileInputStream = new FileInputStream(config);
+            properties.load(fileInputStream);
+            this.isRunMailLog = Integer.parseInt(properties.getProperty("isRunMailLog")) == 1 ? true : false;
+            this.isRunMTALog = Integer.parseInt(properties.getProperty("isRunMTALog")) == 1 ? true : false;
+            logger.info("isRunMTALog "+isRunMTALog);
+            logger.info("isRunMailLog "+isRunMailLog);
+        } catch (IOException ex) {
+            logger.info(ex.getMessage());
+            System.out.println(ex.getMessage());
+
+        } finally {
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException ex) {
+                    logger.info(ex);
+
+                }
+            }
+        }
+    }
+}

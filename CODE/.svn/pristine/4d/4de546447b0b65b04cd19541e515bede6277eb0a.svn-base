@@ -1,0 +1,67 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mtatrace;
+
+import com.viettel.mail.util.ActionThread;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.mail.MessagingException;
+
+/**
+ *
+ * @author thanhbv4
+ */
+public class MtaTrace extends ActionThread {
+
+    /**
+     * @param args the command line arguments
+     */
+    @Override
+    protected void onExecuting() throws Exception {
+    }
+
+    @Override
+    protected void onKilling() {
+    }
+
+    @Override
+    protected void onException(Exception e) {
+    }
+
+    @Override
+    protected long sleeptime() throws Exception {
+        return 24 * 60 * 60 * 1000;
+    }
+
+    @Override
+    protected void action() throws Exception {
+        String url = "jdbc:mysql://10.58.71.227:3306/MTA";
+        String user = "mta";
+        String password = "mta#2017";
+
+        try {
+            // Load the Connect or/J driver
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(MtaTrace.class.getName()).log(Level.SEVERE, null, ex);
+        }
+// Establish connection to MySQL
+        Connection dbConnection = DriverManager.getConnection(url, user, password);
+        System.out.println("Ket noi thanh cong");
+        Statement statement = dbConnection.createStatement();
+// execute create SQL stetement
+        System.out.println("Auto partition by date ");
+        String sql = "CALL create_partition_by_day()";
+        statement.execute(sql);
+        System.out.println("excute finish");
+
+    }
+}

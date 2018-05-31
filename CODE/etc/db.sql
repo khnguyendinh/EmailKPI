@@ -1,0 +1,21 @@
+
+
+  CREATE TABLE mailMTALog (  idLog int(11) NOT NULL AUTO_INCREMENT, 
+  type_log varchar(45) DEFAULT NULL, 
+  time datetime DEFAULT NULL, 
+  miliSecond int(11) DEFAULT NULL,  
+  inforAction varchar(200) DEFAULT NULL,  
+  action varchar(45) DEFAULT NULL, 
+  status varchar(45) DEFAULT NULL,  
+  name_email varchar(200) DEFAULT NULL,
+  ip varchar(200) DEFAULT NULL, 
+  oIp varchar(200) DEFAULT NULL,
+  ua varchar(200) DEFAULT NULL,
+  elapsed int(11) DEFAULT NULL,
+  result varchar(45) DEFAULT NULL,
+  relay  varchar(150) DEFAULT NULL,
+  delay float DEFAULT NULL,
+  delays varchar(150) DEFAULT NULL,
+  dsn varchar(45) DEFAULT NULL,
+  listReceiveFWD MEDIUMTEXT DEFAULT NULL,  
+  PRIMARY KEY (idLog)) ENGINE=InnoDB AUTO_INCREMENT=419 DEFAULT CHARSET=latin1;
